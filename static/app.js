@@ -42,6 +42,15 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
   document.getElementById('bibtexOutput').value = data.bibtex;
 });
 
+async function loadZoteroConfig() {
+  const data = await fetchJSON('/api/zotero-config');
+  const zotero = data.zotero || {};
+  document.getElementById('zoteroUserId').value = zotero.user_id || '';
+  document.getElementById('zoteroApiKey').value = zotero.api_key || '';
+  document.getElementById('zoteroLibraryType').value = zotero.library_type || 'user';
+  document.getElementById('zoteroCollectionKey').value = zotero.collection_key || '';
+}
+
 document.getElementById('pushToZoteroBtn').addEventListener('click', async () => {
   const ids = selectedIds();
   const zotero = {
@@ -79,9 +88,18 @@ document.getElementById('saveSettingsBtn').addEventListener('click', async () =>
     api_key: item.querySelector('.api_key').value,
     enabled: item.querySelector('.enabled').checked,
   }));
-  const data = await fetchJSON('/api/llm-config', { method: 'POST', body: JSON.stringify({ providers }) });
-  document.getElementById('settingsResult').innerText = `已保存 ${data.providers.length} 个 LLM 配置`;
+  const zotero = {
+    user_id: document.getElementById('zoteroUserId').value,
+    api_key: document.getElementById('zoteroApiKey').value,
+    library_type: document.getElementById('zoteroLibraryType').value,
+    collection_key: document.getElementById('zoteroCollectionKey').value,
+  };
+
+  const llmResult = await fetchJSON('/api/llm-config', { method: 'POST', body: JSON.stringify({ providers }) });
+  await fetchJSON('/api/zotero-config', { method: 'POST', body: JSON.stringify({ zotero }) });
+  document.getElementById('settingsResult').innerText = `已保存 ${llmResult.providers.length} 个 LLM 配置与 Zotero 配置`;
 });
 
 loadPapers();
 loadLlmConfig();
+loadZoteroConfig();
