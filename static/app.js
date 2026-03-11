@@ -2,6 +2,9 @@ let papers = [];
 
 const tabs = document.querySelectorAll('nav button');
 tabs.forEach(btn => btn.addEventListener('click', () => {
+  tabs.forEach(tab => tab.classList.remove('active'));
+  btn.classList.add('active');
+
   document.querySelectorAll('.tab').forEach(s => s.classList.remove('active'));
   document.getElementById(btn.dataset.tab).classList.add('active');
 }));
@@ -9,6 +12,15 @@ tabs.forEach(btn => btn.addEventListener('click', () => {
 async function fetchJSON(url, options = {}) {
   const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...options });
   return res.json();
+}
+
+function setStatus(id, message, type = 'success') {
+  const el = document.getElementById(id);
+  el.className = 'status-message';
+  if (message) {
+    el.classList.add(type === 'error' ? 'status-error' : 'status-success');
+  }
+  el.innerText = message;
 }
 
 async function loadPapers() {
@@ -27,9 +39,13 @@ document.getElementById('refreshBtn').addEventListener('click', loadPapers);
 
 document.getElementById('importBtn').addEventListener('click', async () => {
   const input = document.getElementById('paperInput').value;
-  const data = await fetchJSON('/api/import-papers', { method: 'POST', body: JSON.stringify({ input }) });
-  document.getElementById('importResult').innerText = `成功导入 ${data.count} 条`;
-  await loadPapers();
+  try {
+    const data = await fetchJSON('/api/import-papers', { method: 'POST', body: JSON.stringify({ input }) });
+    setStatus('importResult', `成功导入 ${data.count} 条`, 'success');
+    await loadPapers();
+  } catch (err) {
+    setStatus('importResult', `导入失败：${err.message}`, 'error');
+  }
 });
 
 function selectedIds() {
@@ -50,11 +66,16 @@ document.getElementById('pushToZoteroBtn').addEventListener('click', async () =>
     library_type: document.getElementById('zoteroLibraryType').value,
     collection_key: document.getElementById('zoteroCollectionKey').value,
   };
-  const data = await fetchJSON('/api/import-to-zotero', {
-    method: 'POST',
-    body: JSON.stringify({ paper_ids: ids, zotero })
-  });
-  document.getElementById('zoteroResult').innerText = JSON.stringify(data, null, 2);
+
+  try {
+    const data = await fetchJSON('/api/import-to-zotero', {
+      method: 'POST',
+      body: JSON.stringify({ paper_ids: ids, zotero })
+    });
+    setStatus('zoteroResult', JSON.stringify(data, null, 2), 'success');
+  } catch (err) {
+    setStatus('zoteroResult', `导入 Zotero 失败：${err.message}`, 'error');
+  }
 });
 
 async function loadLlmConfig() {
@@ -79,8 +100,13 @@ document.getElementById('saveSettingsBtn').addEventListener('click', async () =>
     api_key: item.querySelector('.api_key').value,
     enabled: item.querySelector('.enabled').checked,
   }));
-  const data = await fetchJSON('/api/llm-config', { method: 'POST', body: JSON.stringify({ providers }) });
-  document.getElementById('settingsResult').innerText = `已保存 ${data.providers.length} 个 LLM 配置`;
+
+  try {
+    const data = await fetchJSON('/api/llm-config', { method: 'POST', body: JSON.stringify({ providers }) });
+    setStatus('settingsResult', `已保存 ${data.providers.length} 个 LLM 配置`, 'success');
+  } catch (err) {
+    setStatus('settingsResult', `保存失败：${err.message}`, 'error');
+  }
 });
 
 loadPapers();
