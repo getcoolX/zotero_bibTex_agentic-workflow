@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zotero Agentic Workflow</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <nav>
+    <button data-tab="import">导入文献</button>
+    <button data-tab="manage">管理文献</button>
+    <button data-tab="export">导出引用</button>
+    <button data-tab="settings">管理 Zotero 和 LLM</button>
+  </nav>
+
+  <main>
+    <section id="import" class="tab active">
+      <h2>导入文献</h2>
+      <p>支持一次粘贴多行论文信息（标题/DOI/URL 混合）</p>
+      <textarea id="paperInput" rows="8" placeholder="每行一个论文"></textarea>
+      <button id="importBtn">提取并导入</button>
+      <div id="importResult"></div>
+    </section>
+
+    <section id="manage" class="tab">
+      <h2>管理文献</h2>
+      <button id="refreshBtn">刷新列表</button>
+      <div id="paperList"></div>
+      <button id="pushToZoteroBtn">选中并导入 Zotero</button>
+      <div id="zoteroResult"></div>
+    </section>
+
+    <section id="export" class="tab">
+      <h2>导出 ACM LaTeX 引用</h2>
+      <button id="exportBtn">导出所选文献 BibTeX</button>
+      <textarea id="bibtexOutput" rows="12" readonly></textarea>
+    </section>
+
+    <section id="settings" class="tab">
+      <h2>管理 Zotero 和 LLM</h2>
+      <h3>Zotero 配置</h3>
+      <input id="zoteroUserId" placeholder="user id" />
+      <input id="zoteroApiKey" placeholder="api key" />
+      <input id="zoteroLibraryType" value="user" placeholder="user/group" />
+      <input id="zoteroCollectionKey" placeholder="collection key (可选)" />
+
+      <h3>LLM 配置</h3>
+      <div id="llmConfig"></div>
+      <button id="saveSettingsBtn">保存配置</button>
+      <div id="settingsResult"></div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

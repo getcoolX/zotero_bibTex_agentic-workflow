@@ -1,0 +1,10 @@
+body { font-family: Arial, sans-serif; margin: 0; }
+nav { display: flex; gap: 8px; padding: 12px; background: #1f2937; }
+nav button { color: white; background: #374151; border: 0; padding: 8px 12px; cursor: pointer; }
+main { padding: 16px; }
+.tab { display: none; }
+.tab.active { display: block; }
+textarea, input { width: 100%; margin: 6px 0; padding: 8px; box-sizing: border-box; }
+button { padding: 8px 12px; margin: 6px 0; }
+.paper-row { display: block; margin: 6px 0; }
+.llm-item { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
