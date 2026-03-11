@@ -8,6 +8,7 @@ from services.bibtex import export_acm_bibtex
 from services.llm_config import LLMConfigManager
 from services.paper_parser import extract_papers
 from services.zotero import ZoteroClient
+from services.zotero_config import ZoteroConfigManager
 from storage import PaperStore
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -16,7 +17,14 @@ STATIC_DIR = BASE_DIR / "static"
 
 class AppHandler(BaseHTTPRequestHandler):
     store = PaperStore(BASE_DIR / "data.sqlite3")
-    llm_manager = LLMConfigManager(BASE_DIR / "config" / "default_llms.json")
+    llm_manager = LLMConfigManager(
+        BASE_DIR / "config" / "llms.local.json",
+        BASE_DIR / "config" / "llms.example.json",
+    )
+    zotero_manager = ZoteroConfigManager(
+        BASE_DIR / "config" / "zotero.local.json",
+        BASE_DIR / "config" / "zotero.example.json",
+    )
 
     def _json_response(self, payload, status=HTTPStatus.OK):
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
@@ -60,6 +68,8 @@ class AppHandler(BaseHTTPRequestHandler):
             return self._json_response({"papers": self.store.list_papers()})
         if parsed.path == "/api/llm-config":
             return self._json_response({"providers": self.llm_manager.list_providers()})
+        if parsed.path == "/api/zotero-config":
+            return self._json_response({"zotero": self.zotero_manager.get_config()})
         if parsed.path == "/api/export-bibtex":
             query = parse_qs(parsed.query)
             ids = [int(x) for x in query.get("ids", [""])[0].split(",") if x.strip().isdigit()]
@@ -78,8 +88,11 @@ class AppHandler(BaseHTTPRequestHandler):
         if parsed.path == "/api/llm-config":
             updated = self.llm_manager.update_providers(payload.get("providers", []))
             return self._json_response({"providers": updated})
+        if parsed.path == "/api/zotero-config":
+            updated = self.zotero_manager.update_config(payload.get("zotero", {}))
+            return self._json_response({"zotero": updated})
         if parsed.path == "/api/import-to-zotero":
-            zotero = payload.get("zotero", {})
+            zotero = payload.get("zotero") or self.zotero_manager.get_config()
             ids = payload.get("paper_ids", [])
             papers = self.store.get_papers(ids)
             client = ZoteroClient(

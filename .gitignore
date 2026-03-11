@@ -1,0 +1,7 @@
+config/*.local.json
+data.sqlite3
+__pycache__/
+*.py[cod]
+*.tmp
+*.temp
+.DS_Store
