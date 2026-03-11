@@ -71,7 +71,21 @@ async function loadLlmConfig() {
   `).join('');
 }
 
+async function loadZoteroConfig() {
+  const data = await fetchJSON('/api/zotero-config');
+  document.getElementById('zoteroUserId').value = data.user_id || '';
+  document.getElementById('zoteroApiKey').value = data.api_key || '';
+  document.getElementById('zoteroLibraryType').value = data.library_type || 'user';
+  document.getElementById('zoteroCollectionKey').value = data.collection_key || '';
+}
+
 document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
+  const zotero = {
+    user_id: document.getElementById('zoteroUserId').value,
+    api_key: document.getElementById('zoteroApiKey').value,
+    library_type: document.getElementById('zoteroLibraryType').value,
+    collection_key: document.getElementById('zoteroCollectionKey').value,
+  };
   const providers = [...document.querySelectorAll('.llm-item')].map(item => ({
     name: item.querySelector('.name').value,
     base_url: item.querySelector('.base_url').value,
@@ -79,9 +93,16 @@ document.getElementById('saveSettingsBtn').addEventListener('click', async () =>
     api_key: item.querySelector('.api_key').value,
     enabled: item.querySelector('.enabled').checked,
   }));
-  const data = await fetchJSON('/api/llm-config', { method: 'POST', body: JSON.stringify({ providers }) });
-  document.getElementById('settingsResult').innerText = `已保存 ${data.providers.length} 个 LLM 配置`;
+  const [zoteroData, llmData] = await Promise.all([
+    fetchJSON('/api/zotero-config', { method: 'POST', body: JSON.stringify(zotero) }),
+    fetchJSON('/api/llm-config', { method: 'POST', body: JSON.stringify({ providers }) })
+  ]);
+  document.getElementById('settingsResult').innerText = [
+    `Zotero 配置${zoteroData.success ? '保存成功' : '保存失败'}`,
+    `LLM 配置${llmData.providers ? `保存成功（${llmData.providers.length} 个）` : '保存失败'}`
+  ].join('；');
 });
 
 loadPapers();
 loadLlmConfig();
+loadZoteroConfig();
