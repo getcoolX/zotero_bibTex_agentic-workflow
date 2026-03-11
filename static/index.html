@@ -8,47 +8,97 @@
 </head>
 <body>
   <nav>
-    <button data-tab="import">导入文献</button>
+    <button class="active" data-tab="import">导入文献</button>
     <button data-tab="manage">管理文献</button>
     <button data-tab="export">导出引用</button>
     <button data-tab="settings">管理 Zotero 和 LLM</button>
   </nav>
 
   <main>
-    <section id="import" class="tab active">
-      <h2>导入文献</h2>
-      <p>支持一次粘贴多行论文信息（标题/DOI/URL 混合）</p>
-      <textarea id="paperInput" rows="8" placeholder="每行一个论文"></textarea>
-      <button id="importBtn">提取并导入</button>
-      <div id="importResult"></div>
+    <section id="import" class="tab active panel">
+      <div class="section-card">
+        <h2>导入文献</h2>
+        <p>支持一次粘贴多行论文信息（标题/DOI/URL 混合）</p>
+        <div class="form-group">
+          <label for="paperInput">论文输入</label>
+          <textarea id="paperInput" rows="8" placeholder="每行一个论文"></textarea>
+        </div>
+        <div class="actions">
+          <button id="importBtn" class="btn-primary">提取并导入</button>
+        </div>
+      </div>
+      <div class="section-card">
+        <h3>导入结果</h3>
+        <div id="importResult" class="status-message" aria-live="polite"></div>
+      </div>
     </section>
 
-    <section id="manage" class="tab">
-      <h2>管理文献</h2>
-      <button id="refreshBtn">刷新列表</button>
-      <div id="paperList"></div>
-      <button id="pushToZoteroBtn">选中并导入 Zotero</button>
-      <div id="zoteroResult"></div>
+    <section id="manage" class="tab panel">
+      <div class="section-card">
+        <h2>管理文献</h2>
+        <div class="actions">
+          <button id="refreshBtn" class="btn-secondary">刷新列表</button>
+        </div>
+        <div id="paperList"></div>
+        <div class="actions">
+          <button id="pushToZoteroBtn" class="btn-primary">选中并导入 Zotero</button>
+        </div>
+      </div>
+      <div class="section-card">
+        <h3>Zotero 返回</h3>
+        <div id="zoteroResult" class="status-message" aria-live="polite"></div>
+      </div>
     </section>
 
-    <section id="export" class="tab">
-      <h2>导出 ACM LaTeX 引用</h2>
-      <button id="exportBtn">导出所选文献 BibTeX</button>
-      <textarea id="bibtexOutput" rows="12" readonly></textarea>
+    <section id="export" class="tab panel">
+      <div class="section-card">
+        <h2>导出 ACM LaTeX 引用</h2>
+        <div class="actions">
+          <button id="exportBtn" class="btn-primary">导出所选文献 BibTeX</button>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="form-group">
+          <label for="bibtexOutput">BibTeX 输出</label>
+          <textarea id="bibtexOutput" rows="12" readonly></textarea>
+        </div>
+      </div>
     </section>
 
-    <section id="settings" class="tab">
-      <h2>管理 Zotero 和 LLM</h2>
-      <h3>Zotero 配置</h3>
-      <input id="zoteroUserId" placeholder="user id" />
-      <input id="zoteroApiKey" placeholder="api key" />
-      <input id="zoteroLibraryType" value="user" placeholder="user/group" />
-      <input id="zoteroCollectionKey" placeholder="collection key (可选)" />
+    <section id="settings" class="tab panel">
+      <div class="section-card">
+        <h2>管理 Zotero 和 LLM</h2>
+        <h3>Zotero 配置</h3>
+        <div class="form-group">
+          <label for="zoteroUserId">User ID</label>
+          <input id="zoteroUserId" placeholder="user id" />
+        </div>
+        <div class="form-group">
+          <label for="zoteroApiKey">API Key</label>
+          <input id="zoteroApiKey" placeholder="api key" />
+        </div>
+        <div class="form-group">
+          <label for="zoteroLibraryType">Library Type</label>
+          <input id="zoteroLibraryType" value="user" placeholder="user/group" />
+        </div>
+        <div class="form-group">
+          <label for="zoteroCollectionKey">Collection Key（可选）</label>
+          <input id="zoteroCollectionKey" placeholder="collection key (可选)" />
+        </div>
+      </div>
 
-      <h3>LLM 配置</h3>
-      <div id="llmConfig"></div>
-      <button id="saveSettingsBtn">保存配置</button>
-      <div id="settingsResult"></div>
+      <div class="section-card">
+        <h3>LLM 配置</h3>
+        <div id="llmConfig"></div>
+        <div class="actions">
+          <button id="saveSettingsBtn" class="btn-primary">保存配置</button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h3>保存状态</h3>
+        <div id="settingsResult" class="status-message" aria-live="polite"></div>
+      </div>
     </section>
   </main>
 
